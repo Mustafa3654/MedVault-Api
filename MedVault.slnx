@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MedVault.Api/MedVault.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MedVault.Api.Tests/MedVault.Api.Tests.csproj" />
+  </Folder>
+</Solution>

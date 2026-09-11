@@ -1,0 +1,44 @@
+CODE    TEST                            UNIT        LOW     HIGH    
+--------------------------------------------------------------------
+01001   RBC                             /cu.mm                      
+01002   Hemoglobin                      g/dl                        
+01003   Hematocrit                      %                           
+01004   MCV                             fl                          
+01005   MCH                             pg                          
+01006   MCHC                            g/dl                        
+01007   Platelet                        / cumm                      
+01008   WBC                             /cu.mm                      
+01009   Neutrophils                     %                           
+01010   Lymphocytes                     %                           
+01011   Monocytes                       %                           
+01012   Eosinophils                     %                           
+01013   Basophils                       %                           
+01100   MPV                             %                           
+01018   Prothrombin Time Control        Sec                         
+01019   Patient PT                      sec                         
+01020   Activity                        %                           
+01021   INR                                                         
+01022   PTT Patient                     Seconds                     
+01023   Control                         sec                         
+02001   Glucose (FBS)                   mg/dl                       
+02002   BUN                             mg/dl                       
+02003   Creatinine                      mg/dl                       
+02004   GFR                             ml/min                      
+02011   Sodium                          mmol/l                      
+02012   Potassium                       mmol/l                      
+02013   Chloride                        mmol/l                      
+02015   Calcium                         mg/dl                       
+02016   AST                             U/L                         
+02017   ALT                             U/L                         
+02042   CRP                             mg/l                        
+07002   Color                                                       
+07003   Specific Gravity                                            
+07004   PH                                                          
+07005   Leucocyte Esterase                                          
+07006   Nitrite                                                     
+07007   Protein                                                     
+07008   Glucose                                                     
+07009   Ketones                                                     
+07010   Urobilirogen                                                
+
+total tests: 40

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Must stay false: Microsoft.Data.SqlClient throws "Globalization Invariant Mode is not
+         supported" the moment it opens a connection. Invariant mode saves a few MB and costs the
+         entire SQL provider, which is the only thing this API exists to do. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Update="Data\Seed\*.json" CopyToOutputDirectory="PreserveNewest" />
+
+    <!-- The reference-range catalogue is deployment data, not source: the lab edits it and it must
+         survive a publish. Only .example.json is shipped - a real reference-ranges.json is created on
+         the server once the lab has signed the ranges off, and PreserveNewest leaves it alone. -->
+    <Content Update="Data\Catalogue\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,410 @@
+{
+  "//": "Reference range catalogue for the Bekaa HIS. This server stores no ranges anywhere, so this file is the only source for ref_range and for the High/Low gauge in the MedVault app.",
+  "//_status": "THIS FILE IS A WORKLIST, NOT A CATALOGUE. Every entry below is BLANK on purpose. The codes, names, units and categories are real - read from DATAPRIX.dbo.RLAB1 on 2026-09-01, ordered by how often each test is used - but no range has been filled in yet.",
+  "//_howto": "For each test the laboratory confirms, set low and high (numeric bounds, used to compute H/L/N), or set text for a range that is not numeric (\"Negative\", \"Yellow\"). Leave an entry untouched and the API returns null for both ref_range and result_status, and the app hides the gauge for that test. That is the safe default - an unverified range shown to a patient is worse than no range at all.",
+  "//_warning": "Ranges are method- and analyser-specific, and several of these vary by sex and age, which this format does not express. Do not copy values from a textbook or another lab. The laboratory director signs these off.",
+  "//_rename": "Rename this file to reference-ranges.json to make the API load it. It is safe to enable while still mostly blank - filled entries work, blank ones stay hidden.",
+  "//_example": "A completed entry looks like: {\"code\": \"02042\", \"test_name\": \"CRP\", \"unit\": \"mg/l\", \"high\": 5}",
+  "tests": [
+    {
+      "code": "01001",
+      "test_name": "RBC",
+      "unit": "/cu.mm",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8811,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01002",
+      "test_name": "Hemoglobin",
+      "unit": "g/dl",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8811,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01003",
+      "test_name": "Hematocrit",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8811,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01004",
+      "test_name": "MCV",
+      "unit": "fl",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8811,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01005",
+      "test_name": "MCH",
+      "unit": "pg",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8812,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01006",
+      "test_name": "MCHC",
+      "unit": "g/dl",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8786,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01007",
+      "test_name": "Platelet",
+      "unit": "/ cumm",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8812,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01008",
+      "test_name": "WBC",
+      "unit": "/cu.mm",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8808,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01009",
+      "test_name": "Neutrophils",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8810,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01010",
+      "test_name": "Lymphocytes",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8809,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01011",
+      "test_name": "Monocytes",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8810,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01012",
+      "test_name": "Eosinophils",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8812,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01013",
+      "test_name": "Basophils",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 8810,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01100",
+      "test_name": "MPV",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 4613,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01018",
+      "test_name": "Prothrombin Time Control",
+      "unit": "Sec",
+      "//category": "HEMATOLOGY",
+      "//times_used": 1746,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01019",
+      "test_name": "Patient PT",
+      "unit": "sec",
+      "//category": "HEMATOLOGY",
+      "//times_used": 1720,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01020",
+      "test_name": "Activity",
+      "unit": "%",
+      "//category": "HEMATOLOGY",
+      "//times_used": 1721,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01021",
+      "test_name": "INR",
+      "unit": "",
+      "//category": "HEMATOLOGY",
+      "//times_used": 1721,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01022",
+      "test_name": "PTT Patient",
+      "unit": "Seconds",
+      "//category": "HEMATOLOGY",
+      "//times_used": 1635,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "01023",
+      "test_name": "Control",
+      "unit": "sec",
+      "//category": "HEMATOLOGY",
+      "//times_used": 1668,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02001",
+      "test_name": "Glucose (FBS)",
+      "unit": "mg/dl",
+      "//category": "CHEMISTRY",
+      "//times_used": 2070,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02002",
+      "test_name": "BUN",
+      "unit": "mg/dl",
+      "//category": "CHEMISTRY",
+      "//times_used": 5034,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02003",
+      "test_name": "Creatinine",
+      "unit": "mg/dl",
+      "//category": "CHEMISTRY",
+      "//times_used": 6224,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02004",
+      "test_name": "GFR",
+      "unit": "ml/min",
+      "//category": "CHEMISTRY",
+      "//times_used": 4074,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02011",
+      "test_name": "Sodium",
+      "unit": "mmol/l",
+      "//category": "CHEMISTRY",
+      "//times_used": 4329,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02012",
+      "test_name": "Potassium",
+      "unit": "mmol/l",
+      "//category": "CHEMISTRY",
+      "//times_used": 4580,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02013",
+      "test_name": "Chloride",
+      "unit": "mmol/l",
+      "//category": "CHEMISTRY",
+      "//times_used": 3683,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02015",
+      "test_name": "Calcium",
+      "unit": "mg/dl",
+      "//category": "CHEMISTRY",
+      "//times_used": 1936,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02016",
+      "test_name": "AST",
+      "unit": "U/L",
+      "//category": "CHEMISTRY",
+      "//times_used": 2392,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02017",
+      "test_name": "ALT",
+      "unit": "U/L",
+      "//category": "CHEMISTRY",
+      "//times_used": 3190,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "02042",
+      "test_name": "CRP",
+      "unit": "mg/l",
+      "//category": "CHEMISTRY",
+      "//times_used": 4295,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07002",
+      "test_name": "Color",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1506,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07003",
+      "test_name": "Specific Gravity",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1508,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07004",
+      "test_name": "PH",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1508,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07005",
+      "test_name": "Leucocyte Esterase",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1506,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07006",
+      "test_name": "Nitrite",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1508,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07007",
+      "test_name": "Protein",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1506,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07008",
+      "test_name": "Glucose",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1506,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07009",
+      "test_name": "Ketones",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1508,
+      "low": null,
+      "high": null,
+      "text": null
+    },
+    {
+      "code": "07010",
+      "test_name": "Urobilirogen",
+      "unit": "",
+      "//category": "URINE ANALYSIS",
+      "//times_used": 1507,
+      "low": null,
+      "high": null,
+      "text": null
+    }
+  ]
+}

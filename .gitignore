@@ -1,0 +1,26 @@
+bin/
+obj/
+publish/
+publish-new/
+.vs/
+*.user
+.idea/
+TestResults/
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.local.json
+secrets/
+*.pfx
+*.p12
+*.key
+
+appsettings.Development.json
+appsettings.Production.json
+appsettings-for-server.json

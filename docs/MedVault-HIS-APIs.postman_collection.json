@@ -1,0 +1,320 @@
+{
+  "info": {
+    "_postman_id": "8f3c1b20-6d21-4d3a-9a41-medvaulthis01",
+    "name": "MedVault ↔ HIS — APIs 1-3",
+    "description": "Login, Requests List and Results, exactly as specified in docs/MedVault-HIS-API-Specification.md (MedVault contract, byte for byte).\n\nUsage:\n1. Set the `host` variable to the API base URL.\n2. Run `1. Login` first — a test script stores `token` automatically; every later request uses it.\n3. `2. Requests List` stores the first `request_nb` into `requestNb`, so `3. Results` runs with no manual editing.\n\nEvery request carries an example response with the full field set. Field names are intentionally not cleaned up: `Lab` has a capital L, `unit` may contain HTML entities, `ref_range` may contain HTML, paths contain escaped slashes, and some `cat_name` values have trailing spaces.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "host", "value": "http://localhost:5000", "type": "string" },
+    { "key": "mobile", "value": "00000000", "type": "string" },
+    { "key": "password", "value": "medvault", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "requestNb", "value": "2026001001", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const b = pm.response.json();",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('success is true', () => pm.expect(b.success).to.eql(true));",
+              "pm.test('token returned', () => pm.expect(b.token).to.be.a('string').and.not.empty);",
+              "pm.test('user echoes the mobile number', () => pm.expect(b.user).to.eql(pm.collectionVariables.get('mobile')));",
+              "pm.test('name present', () => pm.expect(b).to.have.property('name'));",
+              "pm.test('Lab present with capital L', () => pm.expect(b).to.have.property('Lab'));",
+              "if (b.token) { pm.collectionVariables.set('token', b.token); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"{{mobile}}\",\n    \"password\": \"{{password}}\",\n    \"type\": \"P\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] },
+        "description": "API 1 — Login.\n\nRequest fields:\n- `username` — patient's local mobile number, no country code.\n- `password` — per-patient password (open item 3.1(b) in the spec; the original MedVault capture sends no password field).\n- `type` — \"P\" patient, \"D\" doctor.\n\nResponse fields: `success`, `token`, `user`, `name`, `Lab` (capital L).\nFailure is HTTP 200 with `{ \"success\": false, \"message\": \"Invalid credentials\" }` — the app branches on `success`, not on the status code. The same generic message is returned for unknown number and wrong password, so mobile numbers cannot be enumerated."
+      },
+      "response": [
+        {
+          "name": "200 — success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n    \"username\": \"00000000\",\n    \"password\": \"medvault\",\n    \"type\": \"P\"\n}" },
+            "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "cookie": [],
+          "body": "{\n    \"success\": true,\n    \"token\": \"de8c50c556109d4363e8faecf2f7050562ee6eb8361c67314a59f874cceaf6cf1510eec0ec46afe1\",\n    \"user\": \"00000000\",\n    \"name\": \"ALEX EXAMPLE\",\n    \"Lab\": \"MedVault Demo Hospital\"\n}"
+        },
+        {
+          "name": "200 — bad credentials",
+          "originalRequest": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n    \"username\": \"70999999\",\n    \"password\": \"wrong\",\n    \"type\": \"P\"\n}" },
+            "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "cookie": [],
+          "body": "{\n    \"success\": false,\n    \"message\": \"Invalid credentials\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "1b. Login — wrong number (same 200, same message)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"70999999\",\n    \"password\": \"wrong\",\n    \"type\": \"P\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] },
+        "description": "Enumeration check: an unknown mobile number and a wrong password must produce an identical body and status."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Requests List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const b = pm.response.json();",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('requests is an array', () => pm.expect(b.requests).to.be.an('array'));",
+              "const fields = ['request_nb','order_datetime','status','pdf_path','report_datetime','patient_name'];",
+              "pm.test('every row carries the full field set', () => {",
+              "  b.requests.forEach(r => fields.forEach(f => pm.expect(r, JSON.stringify(r)).to.have.property(f)));",
+              "});",
+              "pm.test('order_datetime is YYYY-MM-DD HH:MM:SS, no timezone suffix', () => {",
+              "  b.requests.forEach(r => pm.expect(r.order_datetime).to.match(/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/));",
+              "});",
+              "if (b.requests && b.requests.length) { pm.collectionVariables.set('requestNb', b.requests[0].request_nb); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/request?tcToken={{token}}",
+          "host": ["{{host}}"],
+          "path": ["api", "mobile", "request"],
+          "query": [{ "key": "tcToken", "value": "{{token}}" }]
+        },
+        "description": "API 2 — Requests List. Returns every lab order for the logged-in user **and for all family members sharing the same mobile number**.\n\nPer-row fields:\n- `request_nb` — order number, the key for API 3.\n- `order_datetime` — `YYYY-MM-DD HH:MM:SS`, local hospital time (Asia/Beirut), no timezone suffix.\n- `status` — `\"V\"` = validated. The full code list is an open item with the HIS team.\n- `pdf_path` — relative path to the result PDF, or `null` when unavailable. `null` and `\"\"` are not interchangeable.\n- `report_datetime` — release time, or `null`.\n- `patient_name` — full name; sample data contains double spaces, preserve them.\n\nNo pagination exists in the MedVault contract."
+      },
+      "response": [
+        {
+          "name": "200 — two patients on one mobile number",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/mobile/request?tcToken={{token}}",
+              "host": ["{{host}}"],
+              "path": ["api", "mobile", "request"],
+              "query": [{ "key": "tcToken", "value": "{{token}}" }]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "cookie": [],
+          "body": "{\n    \"requests\": [\n        {\n            \"request_nb\": \"2026001001\",\n            \"order_datetime\": \"2026-03-25 11:03:00\",\n            \"status\": \"V\",\n            \"pdf_path\": \"ResultPDF\\/2026001001\\/example-report.pdf\",\n            \"report_datetime\": \"2026-03-25 14:47:00\",\n            \"patient_name\": \"ALEX  EXAMPLE\"\n        },\n        {\n            \"request_nb\": \"2026001002\",\n            \"order_datetime\": \"2026-05-25 22:37:00\",\n            \"status\": \"V\",\n            \"pdf_path\": null,\n            \"report_datetime\": null,\n            \"patient_name\": \"CASEY  EXAMPLE\"\n        }\n    ]\n}"
+        },
+        {
+          "name": "401 — missing or expired token",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{host}}/api/mobile/request?tcToken=", "host": ["{{host}}"], "path": ["api", "mobile", "request"], "query": [{ "key": "tcToken", "value": "" }] }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "cookie": [],
+          "body": "{\n    \"success\": false,\n    \"message\": \"Unauthorized\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "2b. Requests List — Authorization header instead of query string",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{host}}/api/mobile/request", "host": ["{{host}}"], "path": ["api", "mobile", "request"] },
+        "description": "Same call, token passed as a bearer header. Preferred over the query string — tokens in URLs end up in server and proxy logs."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Results (per request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const b = pm.response.json();",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('request_nb echoed', () => pm.expect(b.request_nb).to.eql(pm.collectionVariables.get('requestNb')));",
+              "pm.test('results is an array', () => pm.expect(b.results).to.be.an('array'));",
+              "const fields = ['name','birthdate','id','test_name','is_title','group_name','group_instruction','group_clinical_remark','unit','ref_range','test_type','test_id','is_valid','category_num','result','result_txt','sign','position','is_main','prev_result_val','prev_order_id','field_num','clinical_remark','method_instruction','code_remark','is_printed','calc_result','calc_unit','group_printed','need_validation','highlight_txt','group_order','group_num','cat_num','cat_name','result_status','dec_pts'];",
+              "pm.test('every row carries all 37 fields, even when null or empty', () => {",
+              "  b.results.forEach(r => fields.forEach(f => pm.expect(r, r.test_name + ' missing ' + f).to.have.property(f)));",
+              "});",
+              "pm.test('result is sent as a string, never a number', () => {",
+              "  b.results.forEach(r => { if (r.result !== null) pm.expect(r.result).to.be.a('string'); });",
+              "});",
+              "pm.test('unvalidated rows are never returned', () => {",
+              "  b.results.forEach(r => pm.expect(r.is_valid).to.eql('Y'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/results?requestnb={{requestNb}}&tcToken={{token}}",
+          "host": ["{{host}}"],
+          "path": ["api", "mobile", "results"],
+          "query": [
+            { "key": "requestnb", "value": "{{requestNb}}" },
+            { "key": "tcToken", "value": "{{token}}" }
+          ]
+        },
+        "description": "API 3 — Results for one request number. Envelope: `{ \"request_nb\": \"…\", \"results\": [ … ] }`, one object per test.\n\nEvery result object must contain all 37 fields even when the value is `null` or `\"\"` — the two are not interchangeable, match the MedVault samples exactly.\n\nFields the MedVault UI actually reads:\n- `name`, `birthdate` — patient header.\n- `test_name` — row label.\n- `result` — primary value, always a **string** (`\"73\"`).\n- `result_txt` — free text, used when `result` is empty.\n- `unit` — may contain HTML entities (`&micro;g/dL`).\n- `ref_range` — may contain HTML (`<div>`, multi-line with `\\r\\n`). Do not strip it.\n- `sign` — display string; observed `\"\"`, `\"High\"`, `\"Low\"`.\n- `result_status` — drives colouring; observed `\"N\"`, `\"H\"`, `\"L\"`, `\"U\"`, `null`.\n- `cat_name` — category tabs; some values carry a trailing space (`\"Hematology \"`).\n- `group_name`, `group_order`, `position` — sub-grouping and row order.\n- `is_title` — `\"Y\"` heading row, `\"N\"` real test.\n- `is_valid` — must be `\"Y\"`; rows that are not validated must not be returned at all."
+      },
+      "response": [
+        {
+          "name": "200 — one result row, full field set",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/mobile/results?requestnb=2026001001&tcToken={{token}}",
+              "host": ["{{host}}"],
+              "path": ["api", "mobile", "results"],
+              "query": [
+                { "key": "requestnb", "value": "2026001001" },
+                { "key": "tcToken", "value": "{{token}}" }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "cookie": [],
+          "body": "{\n    \"request_nb\": \"2026001001\",\n    \"results\": [\n        {\n            \"name\": \"ALEX EXAMPLE\",\n            \"birthdate\": \"1990-01-01\",\n            \"id\": 1857,\n            \"test_name\": \"Iron\",\n            \"is_title\": \"N\",\n            \"group_name\": \"Other\",\n            \"group_instruction\": \"\",\n            \"group_clinical_remark\": \"\",\n            \"unit\": \"&micro;g\\/dL\",\n            \"ref_range\": \"<div>70-180<\\/div>\",\n            \"test_type\": null,\n            \"test_id\": 378,\n            \"is_valid\": \"Y\",\n            \"category_num\": 3,\n            \"result\": \"73\",\n            \"result_txt\": \"\",\n            \"sign\": \"\",\n            \"position\": null,\n            \"is_main\": \"N\",\n            \"prev_result_val\": null,\n            \"prev_order_id\": \"\",\n            \"field_num\": \"115\",\n            \"clinical_remark\": \"\",\n            \"method_instruction\": \"\",\n            \"code_remark\": \"\",\n            \"is_printed\": \"N\",\n            \"calc_result\": null,\n            \"calc_unit\": null,\n            \"group_printed\": null,\n            \"need_validation\": \"N\",\n            \"highlight_txt\": \"N\",\n            \"group_order\": null,\n            \"group_num\": 0,\n            \"cat_num\": 3,\n            \"cat_name\": \"BioChemistry\",\n            \"result_status\": \"N\",\n            \"dec_pts\": null\n        }\n    ]\n}"
+        },
+        {
+          "name": "404 — request_nb not owned by this token's patient",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/mobile/results?requestnb=9999999999&tcToken={{token}}",
+              "host": ["{{host}}"],
+              "path": ["api", "mobile", "results"],
+              "query": [
+                { "key": "requestnb", "value": "9999999999" },
+                { "key": "tcToken", "value": "{{token}}" }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "cookie": [],
+          "body": "{\n    \"success\": false,\n    \"message\": \"Not found\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "3b. Results — order with no released results (200 + empty array)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200, not 404', () => pm.response.to.have.status(200));",
+              "pm.test('results is an empty array', () => pm.expect(pm.response.json().results).to.eql([]));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/results?requestnb=2026001002&tcToken={{token}}",
+          "host": ["{{host}}"],
+          "path": ["api", "mobile", "results"],
+          "query": [
+            { "key": "requestnb", "value": "2026001002" },
+            { "key": "tcToken", "value": "{{token}}" }
+          ]
+        },
+        "description": "An order that exists but has nothing released yet is 200 with an empty array — never a 404. 404 is reserved for an order that is not this patient's."
+      },
+      "response": []
+    },
+    {
+      "name": "3c. Results — order number belonging to someone else (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 404', () => pm.response.to.have.status(404));"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/results?requestnb=9999999999&tcToken={{token}}",
+          "host": ["{{host}}"],
+          "path": ["api", "mobile", "results"],
+          "query": [
+            { "key": "requestnb", "value": "9999999999" },
+            { "key": "tcToken", "value": "{{token}}" }
+          ]
+        },
+        "description": "Access-control check: a valid token must not be able to read another patient's order."
+      },
+      "response": []
+    }
+  ]
+}
