@@ -161,11 +161,12 @@ public static class MobileEndpoints
     // ---------- API 4 ----------
 
     private static async Task<IResult> GetRadiologyAsync(
-        HttpContext ctx, IHisRepository his, ITokenService tokens, CancellationToken ct)
+        HttpContext ctx, IHisRepository his, ITokenService tokens, PdfFileResolver pdfs, CancellationToken ct)
     {
         if (tokens.Validate(ReadToken(ctx)) is not { } account) return Unauthorized();
 
         var studies = await his.GetRadiologyStudiesAsync(account, ct);
+        studies = [.. studies.Select(s => s with { PdfPath = pdfs.PathForRequest(s.StudyNb) ?? s.PdfPath })];
         return Results.Ok(new RadiologyListResponse { Studies = studies });
     }
 
@@ -176,6 +177,7 @@ public static class MobileEndpoints
         [FromQuery] string? studynb,
         IHisRepository his,
         ITokenService tokens,
+        PdfFileResolver pdfs,
         CancellationToken ct)
     {
         if (tokens.Validate(ReadToken(ctx)) is not { } account) return Unauthorized();
@@ -183,6 +185,8 @@ public static class MobileEndpoints
 
         var report = await his.GetRadiologyReportAsync(account, studynb, ct);
         if (report is null) return NotFound();
+
+        report = report with { PdfPath = pdfs.PathForRequest(studynb) ?? report.PdfPath };
 
         return Results.Ok(new RadiologyReportResponse { StudyNb = studynb, Report = report });
     }
@@ -202,10 +206,24 @@ public static class MobileEndpoints
 
         // Ownership first, then path safety. Both must pass, and a failure of either looks identical
         // from outside - a 403 would confirm the file exists.
-        if (!await his.OwnsFileAsync(account, path, ct)) return NotFound();
-
         var full = resolver.Resolve(path);
         if (full is null) return NotFound();
+
+        // Dynamic paths resolved from C:\\ExcelH are authorized by matching them against this
+        // account's own lab request and radiology study numbers. HIS-stored paths still use the
+        // repository ownership check.
+        var ownedOnDisk = false;
+        if (path.StartsWith(PdfFileResolver.UrlPrefix + "/", StringComparison.OrdinalIgnoreCase))
+        {
+            var requests = await his.GetRequestsAsync(account, ct);
+            ownedOnDisk = requests.Any(r => resolver.PathsForRequest(r.RequestNb).Contains(path, StringComparer.OrdinalIgnoreCase));
+            if (!ownedOnDisk)
+            {
+                var studies = await his.GetRadiologyStudiesAsync(account, ct);
+                ownedOnDisk = studies.Any(s => resolver.PathsForRequest(s.StudyNb).Contains(path, StringComparer.OrdinalIgnoreCase));
+            }
+        }
+        if (!ownedOnDisk && !await his.OwnsFileAsync(account, path, ct)) return NotFound();
 
         return Results.File(full, "application/pdf", Path.GetFileName(full));
     }

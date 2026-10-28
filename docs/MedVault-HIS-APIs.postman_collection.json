@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "8f3c1b20-6d21-4d3a-9a41-medvaulthis01",
-    "name": "MedVault ↔ HIS — APIs 1-3",
+    "name": "MedVault ↔ HIS — APIs 1-6",
     "description": "Login, Requests List and Results, exactly as specified in docs/MedVault-HIS-API-Specification.md (MedVault contract, byte for byte).\n\nUsage:\n1. Set the `host` variable to the API base URL.\n2. Run `1. Login` first — a test script stores `token` automatically; every later request uses it.\n3. `2. Requests List` stores the first `request_nb` into `requestNb`, so `3. Results` runs with no manual editing.\n\nEvery request carries an example response with the full field set. Field names are intentionally not cleaned up: `Lab` has a capital L, `unit` may contain HTML entities, `ref_range` may contain HTML, paths contain escaped slashes, and some `cat_name` values have trailing spaces.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -10,7 +10,9 @@
     { "key": "mobile", "value": "00000000", "type": "string" },
     { "key": "password", "value": "medvault", "type": "string" },
     { "key": "token", "value": "", "type": "string" },
-    { "key": "requestNb", "value": "2026001001", "type": "string" }
+    { "key": "requestNb", "value": "2026001001", "type": "string" },
+    { "key": "studyNb", "value": "", "type": "string" },
+    { "key": "pdfPath", "value": "", "type": "string" }
   ],
   "item": [
     {
@@ -313,6 +315,63 @@
           ]
         },
         "description": "Access-control check: a valid token must not be able to read another patient's order."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Radiology Studies — find PDF path",
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+            "const b = pm.response.json();",
+            "pm.test('studies is an array', () => pm.expect(b.studies).to.be.an('array'));",
+            "const s = (b.studies || []).find(x => x.pdf_path);",
+            "pm.test('at least one radiology PDF is available', () => pm.expect(s, 'No study has a pdf_path. Check Files:Root access and that a PDF filename starts with the study number.').to.exist);",
+            "if (s) { pm.collectionVariables.set('studyNb', s.study_nb); pm.collectionVariables.set('pdfPath', s.pdf_path); }"
+          ]
+        }
+      }],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/radiology?tcToken={{token}}",
+          "host": ["{{host}}"],
+          "path": ["api", "mobile", "radiology"],
+          "query": [{ "key": "tcToken", "value": "{{token}}" }]
+        },
+        "description": "API 4 — Returns radiology studies. The test stores the first study with a PDF in studyNb and pdfPath for the next request."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Download Radiology PDF (authorized)",
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+            "pm.test('response is a PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.include('application/pdf'));"
+          ]
+        }
+      }],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/file?path={{pdfPath}}&tcToken={{token}}",
+          "host": ["{{host}}"],
+          "path": ["api", "mobile", "file"],
+          "query": [
+            { "key": "path", "value": "{{pdfPath}}" },
+            { "key": "tcToken", "value": "{{token}}" }
+          ]
+        },
+        "description": "API 6 — Downloads the PDF selected by API 4. Send API 1 (Login), API 4 (Radiology Studies), then this request."
       },
       "response": []
     }

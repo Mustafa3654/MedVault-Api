@@ -46,8 +46,17 @@ public sealed class PdfFileResolver(IConfiguration config)
         if (relativePath.StartsWith('/') || relativePath.StartsWith('\\')) return null;
         if (relativePath.Contains(':')) return null;   // drive letters and NTFS alternate data streams
 
+        // pdf_path is a URL path (for example, ResultPDF/26X007397_102.PDF), while Files:Root
+        // points at the flat directory containing the PDFs. ResultPDF is the URL mount point,
+        // not a physical subdirectory under C:\\ExcelH.
+        var filePath = relativePath.Replace('\\', '/');
+        var prefix = UrlPrefix + "/";
+        if (filePath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            filePath = filePath[prefix.Length..];
+        if (string.IsNullOrWhiteSpace(filePath)) return null;
+
         var rootFull = Path.TrimEndingDirectorySeparator(Path.GetFullPath(_root));
-        var candidate = Path.GetFullPath(Path.Combine(rootFull, relativePath));
+        var candidate = Path.GetFullPath(Path.Combine(rootFull, filePath));
 
         // Belt and braces: confirm the resolved path really is inside the root, so a form we did not
         // anticipate still cannot escape.

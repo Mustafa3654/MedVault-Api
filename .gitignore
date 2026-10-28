@@ -2,6 +2,8 @@ bin/
 obj/
 publish/
 publish-new/
+publish-radiology-update/
+publish-radiology-update.rar
 .vs/
 *.user
 .idea/
