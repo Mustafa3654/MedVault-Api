@@ -6,13 +6,41 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "host", "value": "http://localhost:5000", "type": "string" },
-    { "key": "mobile", "value": "00000000", "type": "string" },
-    { "key": "password", "value": "medvault", "type": "string" },
-    { "key": "token", "value": "", "type": "string" },
-    { "key": "requestNb", "value": "2026001001", "type": "string" },
-    { "key": "studyNb", "value": "", "type": "string" },
-    { "key": "pdfPath", "value": "", "type": "string" }
+    {
+      "key": "host",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "mobile",
+      "value": "00000000",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "medvault",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "requestNb",
+      "value": "2026001001",
+      "type": "string"
+    },
+    {
+      "key": "studyNb",
+      "value": "26X007397",
+      "type": "string"
+    },
+    {
+      "key": "pdfPath",
+      "value": "",
+      "type": "string"
+    }
   ],
   "item": [
     {
@@ -37,13 +65,32 @@
       ],
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n    \"username\": \"{{mobile}}\",\n    \"password\": \"{{password}}\",\n    \"type\": \"P\"\n}",
-          "options": { "raw": { "language": "json" } }
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         },
-        "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] },
+        "url": {
+          "raw": "{{host}}/api/mobile/login",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "login"
+          ]
+        },
         "description": "API 1 — Login.\n\nRequest fields:\n- `username` — patient's local mobile number, no country code.\n- `password` — per-patient password (open item 3.1(b) in the spec; the original MedVault capture sends no password field).\n- `type` — \"P\" patient, \"D\" doctor.\n\nResponse fields: `success`, `token`, `user`, `name`, `Lab` (capital L).\nFailure is HTTP 200 with `{ \"success\": false, \"message\": \"Invalid credentials\" }` — the app branches on `success`, not on the status code. The same generic message is returned for unknown number and wrong password, so mobile numbers cannot be enumerated."
       },
       "response": [
@@ -51,14 +98,37 @@
           "name": "200 — success",
           "originalRequest": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n    \"username\": \"00000000\",\n    \"password\": \"medvault\",\n    \"type\": \"P\"\n}" },
-            "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"00000000\",\n    \"password\": \"medvault\",\n    \"type\": \"P\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/mobile/login",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "login"
+              ]
+            }
           },
           "status": "OK",
           "code": 200,
           "_postman_previewlanguage": "json",
-          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
           "cookie": [],
           "body": "{\n    \"success\": true,\n    \"token\": \"de8c50c556109d4363e8faecf2f7050562ee6eb8361c67314a59f874cceaf6cf1510eec0ec46afe1\",\n    \"user\": \"00000000\",\n    \"name\": \"ALEX EXAMPLE\",\n    \"Lab\": \"MedVault Demo Hospital\"\n}"
         },
@@ -66,14 +136,37 @@
           "name": "200 — bad credentials",
           "originalRequest": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n    \"username\": \"70999999\",\n    \"password\": \"wrong\",\n    \"type\": \"P\"\n}" },
-            "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"70999999\",\n    \"password\": \"wrong\",\n    \"type\": \"P\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/mobile/login",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "login"
+              ]
+            }
           },
           "status": "OK",
           "code": 200,
           "_postman_previewlanguage": "json",
-          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
           "cookie": [],
           "body": "{\n    \"success\": false,\n    \"message\": \"Invalid credentials\"\n}"
         }
@@ -83,13 +176,32 @@
       "name": "1b. Login — wrong number (same 200, same message)",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n    \"username\": \"70999999\",\n    \"password\": \"wrong\",\n    \"type\": \"P\"\n}",
-          "options": { "raw": { "language": "json" } }
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         },
-        "url": { "raw": "{{host}}/api/mobile/login", "host": ["{{host}}"], "path": ["api", "mobile", "login"] },
+        "url": {
+          "raw": "{{host}}/api/mobile/login",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "login"
+          ]
+        },
         "description": "Enumeration check: an unknown mobile number and a wrong password must produce an identical body and status."
       },
       "response": []
@@ -122,9 +234,20 @@
         "header": [],
         "url": {
           "raw": "{{host}}/api/mobile/request?tcToken={{token}}",
-          "host": ["{{host}}"],
-          "path": ["api", "mobile", "request"],
-          "query": [{ "key": "tcToken", "value": "{{token}}" }]
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "request"
+          ],
+          "query": [
+            {
+              "key": "tcToken",
+              "value": "{{token}}"
+            }
+          ]
         },
         "description": "API 2 — Requests List. Returns every lab order for the logged-in user **and for all family members sharing the same mobile number**.\n\nPer-row fields:\n- `request_nb` — order number, the key for API 3.\n- `order_datetime` — `YYYY-MM-DD HH:MM:SS`, local hospital time (Asia/Beirut), no timezone suffix.\n- `status` — `\"V\"` = validated. The full code list is an open item with the HIS team.\n- `pdf_path` — relative path to the result PDF, or `null` when unavailable. `null` and `\"\"` are not interchangeable.\n- `report_datetime` — release time, or `null`.\n- `patient_name` — full name; sample data contains double spaces, preserve them.\n\nNo pagination exists in the MedVault contract."
       },
@@ -136,15 +259,31 @@
             "header": [],
             "url": {
               "raw": "{{host}}/api/mobile/request?tcToken={{token}}",
-              "host": ["{{host}}"],
-              "path": ["api", "mobile", "request"],
-              "query": [{ "key": "tcToken", "value": "{{token}}" }]
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "request"
+              ],
+              "query": [
+                {
+                  "key": "tcToken",
+                  "value": "{{token}}"
+                }
+              ]
             }
           },
           "status": "OK",
           "code": 200,
           "_postman_previewlanguage": "json",
-          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
           "cookie": [],
           "body": "{\n    \"requests\": [\n        {\n            \"request_nb\": \"2026001001\",\n            \"order_datetime\": \"2026-03-25 11:03:00\",\n            \"status\": \"V\",\n            \"pdf_path\": \"ResultPDF\\/2026001001\\/example-report.pdf\",\n            \"report_datetime\": \"2026-03-25 14:47:00\",\n            \"patient_name\": \"ALEX  EXAMPLE\"\n        },\n        {\n            \"request_nb\": \"2026001002\",\n            \"order_datetime\": \"2026-05-25 22:37:00\",\n            \"status\": \"V\",\n            \"pdf_path\": null,\n            \"report_datetime\": null,\n            \"patient_name\": \"CASEY  EXAMPLE\"\n        }\n    ]\n}"
         },
@@ -153,12 +292,33 @@
           "originalRequest": {
             "method": "GET",
             "header": [],
-            "url": { "raw": "{{host}}/api/mobile/request?tcToken=", "host": ["{{host}}"], "path": ["api", "mobile", "request"], "query": [{ "key": "tcToken", "value": "" }] }
+            "url": {
+              "raw": "{{host}}/api/mobile/request?tcToken=",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "request"
+              ],
+              "query": [
+                {
+                  "key": "tcToken",
+                  "value": ""
+                }
+              ]
+            }
           },
           "status": "Unauthorized",
           "code": 401,
           "_postman_previewlanguage": "json",
-          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
           "cookie": [],
           "body": "{\n    \"success\": false,\n    \"message\": \"Unauthorized\"\n}"
         }
@@ -168,8 +328,23 @@
       "name": "2b. Requests List — Authorization header instead of query string",
       "request": {
         "method": "GET",
-        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-        "url": { "raw": "{{host}}/api/mobile/request", "host": ["{{host}}"], "path": ["api", "mobile", "request"] },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{host}}/api/mobile/request",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "request"
+          ]
+        },
         "description": "Same call, token passed as a bearer header. Preferred over the query string — tokens in URLs end up in server and proxy logs."
       },
       "response": []
@@ -205,11 +380,23 @@
         "header": [],
         "url": {
           "raw": "{{host}}/api/mobile/results?requestnb={{requestNb}}&tcToken={{token}}",
-          "host": ["{{host}}"],
-          "path": ["api", "mobile", "results"],
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "results"
+          ],
           "query": [
-            { "key": "requestnb", "value": "{{requestNb}}" },
-            { "key": "tcToken", "value": "{{token}}" }
+            {
+              "key": "requestnb",
+              "value": "{{requestNb}}"
+            },
+            {
+              "key": "tcToken",
+              "value": "{{token}}"
+            }
           ]
         },
         "description": "API 3 — Results for one request number. Envelope: `{ \"request_nb\": \"…\", \"results\": [ … ] }`, one object per test.\n\nEvery result object must contain all 37 fields even when the value is `null` or `\"\"` — the two are not interchangeable, match the MedVault samples exactly.\n\nFields the MedVault UI actually reads:\n- `name`, `birthdate` — patient header.\n- `test_name` — row label.\n- `result` — primary value, always a **string** (`\"73\"`).\n- `result_txt` — free text, used when `result` is empty.\n- `unit` — may contain HTML entities (`&micro;g/dL`).\n- `ref_range` — may contain HTML (`<div>`, multi-line with `\\r\\n`). Do not strip it.\n- `sign` — display string; observed `\"\"`, `\"High\"`, `\"Low\"`.\n- `result_status` — drives colouring; observed `\"N\"`, `\"H\"`, `\"L\"`, `\"U\"`, `null`.\n- `cat_name` — category tabs; some values carry a trailing space (`\"Hematology \"`).\n- `group_name`, `group_order`, `position` — sub-grouping and row order.\n- `is_title` — `\"Y\"` heading row, `\"N\"` real test.\n- `is_valid` — must be `\"Y\"`; rows that are not validated must not be returned at all."
@@ -222,18 +409,35 @@
             "header": [],
             "url": {
               "raw": "{{host}}/api/mobile/results?requestnb=2026001001&tcToken={{token}}",
-              "host": ["{{host}}"],
-              "path": ["api", "mobile", "results"],
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "results"
+              ],
               "query": [
-                { "key": "requestnb", "value": "2026001001" },
-                { "key": "tcToken", "value": "{{token}}" }
+                {
+                  "key": "requestnb",
+                  "value": "2026001001"
+                },
+                {
+                  "key": "tcToken",
+                  "value": "{{token}}"
+                }
               ]
             }
           },
           "status": "OK",
           "code": 200,
           "_postman_previewlanguage": "json",
-          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
           "cookie": [],
           "body": "{\n    \"request_nb\": \"2026001001\",\n    \"results\": [\n        {\n            \"name\": \"ALEX EXAMPLE\",\n            \"birthdate\": \"1990-01-01\",\n            \"id\": 1857,\n            \"test_name\": \"Iron\",\n            \"is_title\": \"N\",\n            \"group_name\": \"Other\",\n            \"group_instruction\": \"\",\n            \"group_clinical_remark\": \"\",\n            \"unit\": \"&micro;g\\/dL\",\n            \"ref_range\": \"<div>70-180<\\/div>\",\n            \"test_type\": null,\n            \"test_id\": 378,\n            \"is_valid\": \"Y\",\n            \"category_num\": 3,\n            \"result\": \"73\",\n            \"result_txt\": \"\",\n            \"sign\": \"\",\n            \"position\": null,\n            \"is_main\": \"N\",\n            \"prev_result_val\": null,\n            \"prev_order_id\": \"\",\n            \"field_num\": \"115\",\n            \"clinical_remark\": \"\",\n            \"method_instruction\": \"\",\n            \"code_remark\": \"\",\n            \"is_printed\": \"N\",\n            \"calc_result\": null,\n            \"calc_unit\": null,\n            \"group_printed\": null,\n            \"need_validation\": \"N\",\n            \"highlight_txt\": \"N\",\n            \"group_order\": null,\n            \"group_num\": 0,\n            \"cat_num\": 3,\n            \"cat_name\": \"BioChemistry\",\n            \"result_status\": \"N\",\n            \"dec_pts\": null\n        }\n    ]\n}"
         },
@@ -244,18 +448,35 @@
             "header": [],
             "url": {
               "raw": "{{host}}/api/mobile/results?requestnb=9999999999&tcToken={{token}}",
-              "host": ["{{host}}"],
-              "path": ["api", "mobile", "results"],
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "results"
+              ],
               "query": [
-                { "key": "requestnb", "value": "9999999999" },
-                { "key": "tcToken", "value": "{{token}}" }
+                {
+                  "key": "requestnb",
+                  "value": "9999999999"
+                },
+                {
+                  "key": "tcToken",
+                  "value": "{{token}}"
+                }
               ]
             }
           },
           "status": "Not Found",
           "code": 404,
           "_postman_previewlanguage": "json",
-          "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
           "cookie": [],
           "body": "{\n    \"success\": false,\n    \"message\": \"Not found\"\n}"
         }
@@ -280,11 +501,23 @@
         "header": [],
         "url": {
           "raw": "{{host}}/api/mobile/results?requestnb=2026001002&tcToken={{token}}",
-          "host": ["{{host}}"],
-          "path": ["api", "mobile", "results"],
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "results"
+          ],
           "query": [
-            { "key": "requestnb", "value": "2026001002" },
-            { "key": "tcToken", "value": "{{token}}" }
+            {
+              "key": "requestnb",
+              "value": "2026001002"
+            },
+            {
+              "key": "tcToken",
+              "value": "{{token}}"
+            }
           ]
         },
         "description": "An order that exists but has nothing released yet is 200 with an empty array — never a 404. 404 is reserved for an order that is not this patient's."
@@ -298,7 +531,9 @@
           "listen": "test",
           "script": {
             "type": "text/javascript",
-            "exec": ["pm.test('HTTP 404', () => pm.response.to.have.status(404));"]
+            "exec": [
+              "pm.test('HTTP 404', () => pm.response.to.have.status(404));"
+            ]
           }
         }
       ],
@@ -307,11 +542,23 @@
         "header": [],
         "url": {
           "raw": "{{host}}/api/mobile/results?requestnb=9999999999&tcToken={{token}}",
-          "host": ["{{host}}"],
-          "path": ["api", "mobile", "results"],
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "results"
+          ],
           "query": [
-            { "key": "requestnb", "value": "9999999999" },
-            { "key": "tcToken", "value": "{{token}}" }
+            {
+              "key": "requestnb",
+              "value": "9999999999"
+            },
+            {
+              "key": "tcToken",
+              "value": "{{token}}"
+            }
           ]
         },
         "description": "Access-control check: a valid token must not be able to read another patient's order."
@@ -320,55 +567,126 @@
     },
     {
       "name": "4. Radiology Studies — find PDF path",
-      "event": [{
-        "listen": "test",
-        "script": {
-          "type": "text/javascript",
-          "exec": [
-            "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
-            "const b = pm.response.json();",
-            "pm.test('studies is an array', () => pm.expect(b.studies).to.be.an('array'));",
-            "const s = (b.studies || []).find(x => x.pdf_path);",
-            "pm.test('at least one radiology PDF is available', () => pm.expect(s, 'No study has a pdf_path. Check Files:Root access and that a PDF filename starts with the study number.').to.exist);",
-            "if (s) { pm.collectionVariables.set('studyNb', s.study_nb); pm.collectionVariables.set('pdfPath', s.pdf_path); }"
-          ]
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('studies is an array', () => pm.expect(b.studies).to.be.an('array'));",
+              "const s = (b.studies || []).find(x => x.pdf_path);",
+              "pm.test('at least one radiology PDF is available', () => pm.expect(s, 'No study has a pdf_path. Check Files:Root access and that a PDF filename starts with the study number.').to.exist);",
+              "if (s) { pm.collectionVariables.set('studyNb', s.study_nb); pm.collectionVariables.set('pdfPath', s.pdf_path); }"
+            ]
+          }
         }
-      }],
+      ],
       "request": {
         "method": "GET",
         "header": [],
         "url": {
           "raw": "{{host}}/api/mobile/radiology?tcToken={{token}}",
-          "host": ["{{host}}"],
-          "path": ["api", "mobile", "radiology"],
-          "query": [{ "key": "tcToken", "value": "{{token}}" }]
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "radiology"
+          ],
+          "query": [
+            {
+              "key": "tcToken",
+              "value": "{{token}}"
+            }
+          ]
         },
         "description": "API 4 — Returns radiology studies. The test stores the first study with a PDF in studyNb and pdfPath for the next request."
       },
       "response": []
     },
     {
-      "name": "6. Download Radiology PDF (authorized)",
-      "event": [{
-        "listen": "test",
-        "script": {
-          "type": "text/javascript",
-          "exec": [
-            "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
-            "pm.test('response is a PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.include('application/pdf'));"
-          ]
+      "name": "5. Radiology Report — temporary pending display test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('report is_valid is Y for the temporary test', () => pm.expect(b.report.is_valid).to.eql('Y'));",
+              "pm.test('PDF path was attached', () => pm.expect(b.report.pdf_path || '').to.include('ResultPDF/'))"
+            ]
+          }
         }
-      }],
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/radiologyreport?studynb={{studyNb}}&tcToken={{token}}",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "radiologyreport"
+          ],
+          "query": [
+            {
+              "value": "{{studyNb}}",
+              "key": "studynb"
+            },
+            {
+              "value": "{{token}}",
+              "key": "tcToken"
+            }
+          ]
+        },
+        "description": "API 5 temporary test for study 26X007397 only. Run Login, then API 4 so studyNb is stored, then this request. It returns is_valid=Y only for that one study to test MedVault pending display."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Download Radiology PDF (authorized)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('response is a PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.include('application/pdf'));"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
         "header": [],
         "url": {
           "raw": "{{host}}/api/mobile/file?path={{pdfPath}}&tcToken={{token}}",
-          "host": ["{{host}}"],
-          "path": ["api", "mobile", "file"],
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "file"
+          ],
           "query": [
-            { "key": "path", "value": "{{pdfPath}}" },
-            { "key": "tcToken", "value": "{{token}}" }
+            {
+              "key": "path",
+              "value": "{{pdfPath}}"
+            },
+            {
+              "key": "tcToken",
+              "value": "{{token}}"
+            }
           ]
         },
         "description": "API 6 — Downloads the PDF selected by API 4. Send API 1 (Login), API 4 (Radiology Studies), then this request."
