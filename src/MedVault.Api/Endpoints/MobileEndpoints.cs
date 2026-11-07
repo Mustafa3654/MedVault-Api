@@ -15,6 +15,7 @@ public static class MobileEndpoints
         group.MapPost("/login", LoginAsync).RequireRateLimiting("login");
         group.MapPost("/logout", Logout);
         group.MapGet("/request", GetRequestsAsync);
+        group.MapGet("/patients", GetDoctorPatientsAsync);
         group.MapGet("/results", GetResultsAsync);
         group.MapGet("/radiology", GetRadiologyAsync);
         group.MapGet("/radiologyreport", GetRadiologyReportAsync);
@@ -41,7 +42,7 @@ public static class MobileEndpoints
 
         // Same message, same status and same amount of work for "no such number" and "wrong password",
         // so the endpoint cannot be used to discover which mobile numbers belong to patients.
-        if (!PasswordAccepted(body.Password, account, config) || account is null)
+        if (!PasswordAccepted(body.Password, account, config, type) || account is null)
             return Results.Ok(new ErrorResponse { Message = "Invalid credentials" });
 
         if (IsImplausibleFamilyGroup(account, config))
@@ -75,8 +76,10 @@ public static class MobileEndpoints
     /// throwaway hash, so an unknown number costs the same time as a known one - see
     /// <see cref="PasswordHasher.DummyHash"/>. The caller checks for null separately.
     /// </remarks>
-    private static bool PasswordAccepted(string? supplied, HisAccount? account, IConfiguration config)
+    private static bool PasswordAccepted(string? supplied, HisAccount? account, IConfiguration config, string type)
     {
+        // API 1's VMC contract sends only username and type for doctor logins.
+        if (type == "D") return true;
         if (!config.GetValue("Auth:RequirePassword", true)) return true;
 
         var stored = account?.PasswordHash ?? PasswordHasher.DummyHash;
@@ -111,6 +114,18 @@ public static class MobileEndpoints
     }
 
     // ---------- API 2 ----------
+
+    private static async Task<IResult> GetDoctorPatientsAsync(
+        HttpContext ctx, IHisRepository his, ITokenService tokens, CancellationToken ct)
+    {
+        if (tokens.Validate(ReadToken(ctx)) is not { } account) return Unauthorized();
+        if (account.Type != "D")
+            return Results.Json(new ErrorResponse { Message = "Doctor account required" },
+                statusCode: StatusCodes.Status403Forbidden);
+
+        var patients = await his.GetDoctorPatientsAsync(account, ct);
+        return Results.Ok(new DoctorPatientsResponse { Patients = patients });
+    }
 
     private static async Task<IResult> GetRequestsAsync(
         HttpContext ctx, IHisRepository his, ITokenService tokens, PdfFileResolver pdfs, CancellationToken ct)

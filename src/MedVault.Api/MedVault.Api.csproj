@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Content Update="Data\Seed\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
 
     <!-- The reference-range catalogue is deployment data, not source: the lab edits it and it must
          survive a publish. Only .example.json is shipped - a real reference-ranges.json is created on

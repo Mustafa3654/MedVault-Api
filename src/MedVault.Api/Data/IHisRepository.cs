@@ -12,7 +12,8 @@ public sealed record HisAccount(
     string Name,
     string Type,
     IReadOnlyList<string> LinkedPatientIds,
-    string? PasswordHash);
+    string? PasswordHash,
+    string? DoctorCode = null);
 
 /// <summary>
 /// Everything the API needs from the HIS. This is the only seam that changes when the real
@@ -28,6 +29,8 @@ public interface IHisRepository
     Task<HisAccount?> FindAccountAsync(string mobile, string type, CancellationToken ct);
 
     Task<IReadOnlyList<RequestItem>> GetRequestsAsync(HisAccount account, CancellationToken ct);
+
+    Task<IReadOnlyList<DoctorPatientItem>> GetDoctorPatientsAsync(HisAccount account, CancellationToken ct);
 
     /// <summary>
     /// Null when the request does not exist or does not belong to <paramref name="account"/>.

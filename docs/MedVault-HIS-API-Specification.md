@@ -137,8 +137,9 @@ each lets anyone enumerate which mobile numbers are registered patients.
 3. **Token lifetime.** Not defined by MedVault. Proposed: valid **12 hours**, single-use refresh by re-login,
    invalidated server-side on logout. **[CONFIRM]**
 
-4. **Doctor accounts (`type: "D"`).** What does a doctor see — only their own referred patients, or all?
-   Scope must be defined before `"D"` is enabled at all.
+4. **Doctor accounts (`type: "D"`).** Login uses the doctor's phone number from
+   `DATAPRIX.dbo.DOCTORS.TEL` / `TEL1`. The patient data scope for subsequent endpoints still needs to be
+   defined: only patients assigned/referred to that doctor, or a broader set?
 
 ---
 
@@ -343,6 +344,7 @@ Working SQL for login, requests and radiology is already in `appsettings.json` u
 | `Lab` | *constant* | — | Facility display name |
 | linked family members | `DPERSONEL.dbo.PERSONEL` | rows sharing the same `TEL` | Confirms open item 2: one phone really does cover several patients |
 | password hash | — | — | **No password column exists.** See section 3, item 1 |
+| doctor `username` (`type: "D"`) | `DATAPRIX.dbo.DOCTORS` | `TEL`, falling back to `TEL1` | Returns the doctor's `NOM`; `ADMI` is the doctor code. API 1 is passwordless as shown in the VMC request |
 
 ### 6.2 Requests list
 
@@ -768,3 +770,8 @@ this step until they are written — that is the checklist working, not a defect
 **Resolved** since the first draft, from the existing BSB integration: the family-member link
 (`PERSONEL` rows sharing a `TEL`), the lab/radiology split (3rd character of `ADMI`), and the login,
 requests and radiology-list queries — all in section 6.0.
+
+
+## Doctor patient list
+
+`GET /api/mobile/patients` requires a doctor token and returns one row per distinct patient whose visit in `DATA1.dbo.MALADE` has a `CODEDOCT` matching the authenticated doctor's `DATAPRIX.dbo.DOCTORS.ADMI` code. It includes visits across all departments, not only laboratory visits. The response fields are `patient_id`, `name`, and `last_visit_datetime`. Patient accounts receive `403`.

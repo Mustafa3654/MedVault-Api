@@ -40,6 +40,21 @@
       "key": "pdfPath",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "doctorMobile",
+      "value": "70535819",
+      "type": "string"
+    },
+    {
+      "key": "doctorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorRequestNb",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -171,6 +186,58 @@
           "body": "{\n    \"success\": false,\n    \"message\": \"Invalid credentials\"\n}"
         }
       ]
+    },
+    {
+      "name": "1c. Doctor Login — mobile number only",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const b = pm.response.json();",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('success is true', () => pm.expect(b.success).to.eql(true));",
+              "pm.test('token returned', () => pm.expect(b.token).to.be.a('string').and.not.empty);",
+              "pm.test('user echoes the doctor mobile', () => pm.expect(b.user).to.eql(pm.collectionVariables.get('doctorMobile')));",
+              "pm.test('doctor name present', () => pm.expect(b.name).to.be.a('string').and.not.empty);",
+              "pm.test('Lab present with capital L', () => pm.expect(b).to.have.property('Lab'));",
+              "if (b.token) { pm.collectionVariables.set('doctorToken', b.token); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"{{doctorMobile}}\",\n    \"type\": \"D\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{host}}/api/mobile/login",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "login"
+          ]
+        },
+        "description": "API 1 doctor login per the VMC documentation. Sends only username (doctor mobile number) and type D; no password. On success, saves the returned token to doctorToken."
+      },
+      "response": []
     },
     {
       "name": "1b. Login — wrong number (same 200, same message)",
@@ -346,6 +413,90 @@
           ]
         },
         "description": "Same call, token passed as a bearer header. Preferred over the query string — tokens in URLs end up in server and proxy logs."
+      },
+      "response": []
+    },
+    {
+      "name": "2c. Requests List — doctor",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const b = pm.response.json();",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('requests is an array', () => pm.expect(b.requests).to.be.an('array'));",
+              "pm.test('doctor has assigned lab visits', () => pm.expect(b.requests.length).to.be.above(0));",
+              "const fields = ['request_nb','order_datetime','status','pdf_path','report_datetime','patient_name'];",
+              "pm.test('each visit includes the request fields', () => b.requests.forEach(r => fields.forEach(f => pm.expect(r).to.have.property(f))));",
+              "if (b.requests && b.requests.length) { pm.collectionVariables.set('doctorRequestNb', b.requests[0].request_nb); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/request?tcToken={{doctorToken}}",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "request"
+          ],
+          "query": [
+            {
+              "key": "tcToken",
+              "value": "{{doctorToken}}"
+            }
+          ]
+        },
+        "description": "API 2 using the token saved by 1c Doctor Login. Returns assigned visits across all ADMI department characters, including I, X, E, L, N, and K. Use 2d Doctor Patients for one row per patient."
+      },
+      "response": []
+    },
+    {
+      "name": "2d. Doctor Patients — all visit types",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const b = pm.response.json();",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('patients is an array', () => pm.expect(b.patients).to.be.an('array'));",
+              "const fields = ['patient_id','name','last_visit_datetime'];",
+              "pm.test('each patient has the directory fields', () => b.patients.forEach(p => fields.forEach(f => pm.expect(p).to.have.property(f))));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/api/mobile/patients?tcToken={{doctorToken}}",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "mobile",
+            "patients"
+          ],
+          "query": [
+            {
+              "key": "tcToken",
+              "value": "{{doctorToken}}"
+            }
+          ]
+        },
+        "description": "Returns distinct patients with visits assigned to the doctor across all visit types. Run 1c Doctor Login first."
       },
       "response": []
     },

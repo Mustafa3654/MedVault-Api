@@ -302,6 +302,9 @@ public sealed class ProxyAndAuthHardeningTests
         public Task<IReadOnlyList<RequestItem>> GetRequestsAsync(HisAccount a, CancellationToken ct) =>
             Task.FromResult<IReadOnlyList<RequestItem>>([]);
 
+        public Task<IReadOnlyList<DoctorPatientItem>> GetDoctorPatientsAsync(HisAccount a, CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<DoctorPatientItem>>([]);
+
         public Task<IReadOnlyList<RadiologyStudyItem>> GetRadiologyStudiesAsync(HisAccount a, CancellationToken ct) =>
             Task.FromResult<IReadOnlyList<RadiologyStudyItem>>([]);
 

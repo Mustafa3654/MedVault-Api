@@ -38,29 +38,30 @@ public sealed class SqlHisRepository(
 
     public async Task<HisAccount?> FindAccountAsync(string mobile, string type, CancellationToken ct)
     {
-        // Expected columns: name, password_hash (optional), patient_id
-        // One row per linked patient (spec section 6.1) - the family group sharing this mobile number.
+        // Patient accounts resolve through the patient/person table; doctor accounts resolve through
+        // the doctor catalogue. Both use the submitted phone number as the login name per API 1.
         await using var conn = await OpenAsync(ct);
         await using var cmd = conn.CreateCommand();
-        cmd.CommandText = Sql("FindAccount");
+        cmd.CommandText = Sql(type == "D" ? "FindDoctorAccount" : "FindAccount");
         cmd.Parameters.Add(new SqlParameter("@mobile", mobile));
         cmd.Parameters.Add(new SqlParameter("@type", type));
 
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         var row = new Row(reader);
 
-        string? name = null, passwordHash = null;
+        string? name = null, passwordHash = null, doctorCode = null;
         var patientIds = new List<string>();
 
         while (await reader.ReadAsync(ct))
         {
             name ??= row.Str("name");
             passwordHash ??= row.Str("password_hash");
+            doctorCode ??= row.Str("doctor_code");
             if (row.Str("patient_id") is { Length: > 0 } id) patientIds.Add(id);
         }
 
         if (name is null) return null;
-        return new HisAccount(mobile, name, type, patientIds, passwordHash);
+        return new HisAccount(mobile, name, type, patientIds, passwordHash, doctorCode);
     }
 
     // ---------- Requests ----------
@@ -69,8 +70,19 @@ public sealed class SqlHisRepository(
     {
         await using var conn = await OpenAsync(ct);
         await using var cmd = conn.CreateCommand();
-        cmd.CommandText = Sql("GetRequests");
-        cmd.Parameters.Add(new SqlParameter("@mobile", account.Mobile));
+        if (account.Type == "D")
+        {
+            if (string.IsNullOrWhiteSpace(account.DoctorCode))
+                throw new InvalidOperationException("The authenticated doctor account has no HIS doctor code.");
+
+            cmd.CommandText = Sql("GetDoctorRequests");
+            cmd.Parameters.Add(new SqlParameter("@doctorCode", account.DoctorCode));
+        }
+        else
+        {
+            cmd.CommandText = Sql("GetRequests");
+            cmd.Parameters.Add(new SqlParameter("@mobile", account.Mobile));
+        }
 
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         var row = new Row(reader);
@@ -103,6 +115,33 @@ public sealed class SqlHisRepository(
         return items;
     }
 
+    public async Task<IReadOnlyList<DoctorPatientItem>> GetDoctorPatientsAsync(HisAccount account, CancellationToken ct)
+    {
+        if (account.Type != "D" || string.IsNullOrWhiteSpace(account.DoctorCode))
+            return [];
+
+        await using var conn = await OpenAsync(ct);
+        await using var cmd = conn.CreateCommand();
+        cmd.CommandText = Sql("GetDoctorPatients");
+        cmd.Parameters.Add(new SqlParameter("@doctorCode", account.DoctorCode));
+
+        await using var reader = await cmd.ExecuteReaderAsync(ct);
+        var row = new Row(reader);
+        var patients = new List<DoctorPatientItem>();
+        while (await reader.ReadAsync(ct))
+        {
+            if (row.Str("patient_id") is not { Length: > 0 } patientId) continue;
+            patients.Add(new DoctorPatientItem
+            {
+                PatientId = patientId,
+                Name = row.Str("name") ?? "",
+                LastVisitDatetime = row.Str("last_visit_datetime") ?? "",
+            });
+        }
+
+        return patients;
+    }
+
     // ---------- Results ----------
 
     public async Task<IReadOnlyList<ResultItem>?> GetResultsAsync(HisAccount account, string requestNb, CancellationToken ct)
@@ -124,6 +163,7 @@ public sealed class SqlHisRepository(
         cmd.CommandText = Sql("GetResults");
         cmd.Parameters.Add(new SqlParameter("@mobile", account.Mobile));
         cmd.Parameters.Add(new SqlParameter("@requestnb", requestNb));
+        cmd.Parameters.Add(new SqlParameter("@doctorCode", (object?)account.DoctorCode ?? DBNull.Value));
 
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         var row = new Row(reader);

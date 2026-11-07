@@ -39,6 +39,20 @@ public sealed record RequestsResponse
     [JsonPropertyName("requests")] public required IReadOnlyList<RequestItem> Requests { get; init; }
 }
 
+// ---------- Doctor: assigned patient directory ----------
+
+public sealed record DoctorPatientsResponse
+{
+    [JsonPropertyName("patients")] public required IReadOnlyList<DoctorPatientItem> Patients { get; init; }
+}
+
+public sealed record DoctorPatientItem
+{
+    [JsonPropertyName("patient_id")] public required string PatientId { get; init; }
+    [JsonPropertyName("name")] public required string Name { get; init; }
+    [JsonPropertyName("last_visit_datetime")] public required string LastVisitDatetime { get; init; }
+}
+
 public sealed record RequestItem
 {
     [JsonPropertyName("request_nb")] public required string RequestNb { get; init; }

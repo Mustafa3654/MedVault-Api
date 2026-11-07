@@ -56,6 +56,9 @@ public sealed class MockHisRepository : IHisRepository
     public Task<IReadOnlyList<RequestItem>> GetRequestsAsync(HisAccount account, CancellationToken ct) =>
         Task.FromResult(account.Mobile == SeedMobile ? _requests : []);
 
+    public Task<IReadOnlyList<DoctorPatientItem>> GetDoctorPatientsAsync(HisAccount account, CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<DoctorPatientItem>>([]);
+
     public Task<IReadOnlyList<ResultItem>?> GetResultsAsync(HisAccount account, string requestNb, CancellationToken ct)
     {
         if (account.Mobile != SeedMobile || !_requests.Any(r => r.RequestNb == requestNb))
